@@ -7,14 +7,14 @@ const Player = require('./player.js');
 /* Global variables */
 var canvas = document.getElementById('screen');
 var game = new Game(canvas, update, render);
-var player = new Player({x: canvas.width/2, y: canvas.height/2}, canvas);
+var player = new Player({ x: canvas.width / 2, y: canvas.height / 2 }, canvas);
 
 /**
  * @function masterLoop
  * Advances the game in sync with the refresh rate of the screen
  * @param {DOMHighResTimeStamp} timestamp the current time
  */
-var masterLoop = function(timestamp) {
+var masterLoop = function (timestamp) {
   game.loop(timestamp);
   window.requestAnimationFrame(masterLoop);
 }

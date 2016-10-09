@@ -1,6 +1,7 @@
 "use strict";
 
-const MS_PER_FRAME = 1000/8;
+const MS_PER_FRAME = 1000 / 8;
+const maxVelocity = 15;
 
 /**
  * @module exports the Player class
@@ -25,41 +26,57 @@ function Player(position, canvas) {
     y: 0
   }
   this.angle = 0;
-  this.radius  = 64;
+  this.radius = 64;
   this.thrusting = false;
   this.steerLeft = false;
   this.steerRight = false;
 
   var self = this;
-  window.onkeydown = function(event) {
-    switch(event.key) {
+
+  window.onkeydown = function (event) {
+    switch (event.key) {
       case 'ArrowUp': // up
       case 'w':
+        event.preventDefault();
         self.thrusting = true;
         break;
+
       case 'ArrowLeft': // left
       case 'a':
+        event.preventDefault();
         self.steerLeft = true;
         break;
+
       case 'ArrowRight': // right
       case 'd':
+        event.preventDefault();
         self.steerRight = true;
+        break;
+
+      case ' ': // Really JavaScript?! 'Space' doesnt work but ' ' does?
+        event.preventDefault();
+        console.log("BANG");
         break;
     }
   }
 
-  window.onkeyup = function(event) {
-    switch(event.key) {
+  window.onkeyup = function (event) {
+    switch (event.key) {
       case 'ArrowUp': // up
       case 'w':
+        event.preventDefault();
         self.thrusting = false;
         break;
+
       case 'ArrowLeft': // left
       case 'a':
+        event.preventDefault();
         self.steerLeft = false;
         break;
+
       case 'ArrowRight': // right
       case 'd':
+        event.preventDefault();
         self.steerRight = false;
         break;
     }
@@ -72,31 +89,33 @@ function Player(position, canvas) {
  * @function updates the player object
  * {DOMHighResTimeStamp} time the elapsed time since the last frame
  */
-Player.prototype.update = function(time) {
+Player.prototype.update = function (time) {
   // Apply angular velocity
-  if(this.steerLeft) {
-    this.angle += time * 0.005;
-  }
-  if(this.steerRight) {
-    this.angle -= 0.1;
-  }
+  if (this.steerLeft) this.angle += 0.1;
+  if (this.steerRight) this.angle -= 0.1;
   // Apply acceleration
-  if(this.thrusting) {
+  if (this.thrusting) {
     var acceleration = {
-      x: Math.sin(this.angle),
-      y: Math.cos(this.angle)
+      x: Math.sin(this.angle) / 4,
+      y: Math.cos(this.angle) / 4
     }
     this.velocity.x -= acceleration.x;
+    if (this.velocity.x < -maxVelocity) this.velocity.x = -maxVelocity;
+    else if (this.velocity.x > maxVelocity) this.velocity.x = maxVelocity;
     this.velocity.y -= acceleration.y;
+    if (this.velocity.y < -maxVelocity) this.velocity.y = -maxVelocity;
+    else if (this.velocity.y > maxVelocity) this.velocity.y = maxVelocity;
   }
   // Apply velocity
   this.position.x += this.velocity.x;
   this.position.y += this.velocity.y;
   // Wrap around the screen
-  if(this.position.x < 0) this.position.x += this.worldWidth;
-  if(this.position.x > this.worldWidth) this.position.x -= this.worldWidth;
-  if(this.position.y < 0) this.position.y += this.worldHeight;
-  if(this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
+  if (this.position.x < 0) this.position.x += this.worldWidth;
+  if (this.position.x > this.worldWidth) this.position.x -= this.worldWidth;
+  if (this.position.y < 0) this.position.y += this.worldHeight;
+  if (this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
+
+  // console.log("velocity = " + this.velocity.x + " / " + this.velocity.y);
 }
 
 /**
@@ -104,7 +123,7 @@ Player.prototype.update = function(time) {
  * {DOMHighResTimeStamp} time the elapsed time since the last frame
  * {CanvasRenderingContext2D} ctx the context to render into
  */
-Player.prototype.render = function(time, ctx) {
+Player.prototype.render = function (time, ctx) {
   ctx.save();
 
   // Draw player's ship
@@ -120,7 +139,7 @@ Player.prototype.render = function(time, ctx) {
   ctx.stroke();
 
   // Draw engine thrust
-  if(this.thrusting) {
+  if (this.thrusting) {
     ctx.beginPath();
     ctx.moveTo(0, 20);
     ctx.lineTo(5, 10);

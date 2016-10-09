@@ -34,7 +34,7 @@ function Game(screen, updateFunction, renderFunction) {
  * Pause or unpause the game
  * @param {bool} pause true to pause, false to start
  */
-Game.prototype.pause = function(flag) {
+Game.prototype.pause = function (flag) {
   this.paused = (flag == true);
 }
 
@@ -43,12 +43,12 @@ Game.prototype.pause = function(flag) {
  * The main game loop.
  * @param{time} the current time as a DOMHighResTimeStamp
  */
-Game.prototype.loop = function(newTime) {
+Game.prototype.loop = function (newTime) {
   var game = this;
   var elapsedTime = newTime - this.oldTime;
   this.oldTime = newTime;
 
-  if(!this.paused) this.update(elapsedTime);
+  if (!this.paused) this.update(elapsedTime);
   this.render(elapsedTime, this.frontCtx);
 
   // Flip the back buffer
