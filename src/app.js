@@ -96,6 +96,11 @@ window.onkeydown = function (event) {
           player.steerRight = true;
           break;
 
+        // case "ArrowDown":
+        // case "s":
+        //   player.braking = true;
+        //   break;
+
         case " ": // Really JavaScript?! "Space" doesnt work but " " does?
           event.preventDefault();
           player.shoot();
@@ -126,6 +131,11 @@ window.onkeyup = function (event) {
           event.preventDefault();
           player.steerRight = false;
           break;
+
+        // case "ArrowDown":
+        // case "s":
+        //   player.braking = false;
+        //   break;
       }
       break;
   }

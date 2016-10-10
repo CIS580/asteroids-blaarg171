@@ -27,6 +27,7 @@ function Player(position, canvas) {
   this.angle = 0;
   this.radius = 64;
   this.thrusting = false;
+  this.braking = false;
   this.steerLeft = false;
   this.steerRight = false;
 
@@ -54,6 +55,11 @@ Player.prototype.update = function (time) {
     if (this.velocity.y < -maxVelocity) this.velocity.y = -maxVelocity;
     else if (this.velocity.y > maxVelocity) this.velocity.y = maxVelocity;
   }
+  // else if (this.braking) {
+  //   this.velocity.x *= 0.9;
+  //   this.velocity.y *= 0.9;
+  // }
+
   // Apply velocity
   this.position.x += this.velocity.x;
   this.position.y += this.velocity.y;
