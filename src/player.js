@@ -16,7 +16,6 @@ module.exports = exports = Player;
 function Player(position, canvas) {
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
-  this.state = "idle";
   this.position = {
     x: position.x,
     y: position.y
@@ -31,59 +30,8 @@ function Player(position, canvas) {
   this.steerLeft = false;
   this.steerRight = false;
 
-  var self = this;
-
-  window.onkeydown = function (event) {
-    switch (event.key) {
-      case 'ArrowUp': // up
-      case 'w':
-        event.preventDefault();
-        self.thrusting = true;
-        break;
-
-      case 'ArrowLeft': // left
-      case 'a':
-        event.preventDefault();
-        self.steerLeft = true;
-        break;
-
-      case 'ArrowRight': // right
-      case 'd':
-        event.preventDefault();
-        self.steerRight = true;
-        break;
-
-      case ' ': // Really JavaScript?! 'Space' doesnt work but ' ' does?
-        event.preventDefault();
-        console.log("BANG");
-        break;
-    }
-  }
-
-  window.onkeyup = function (event) {
-    switch (event.key) {
-      case 'ArrowUp': // up
-      case 'w':
-        event.preventDefault();
-        self.thrusting = false;
-        break;
-
-      case 'ArrowLeft': // left
-      case 'a':
-        event.preventDefault();
-        self.steerLeft = false;
-        break;
-
-      case 'ArrowRight': // right
-      case 'd':
-        event.preventDefault();
-        self.steerRight = false;
-        break;
-    }
-  }
+  // var self = this;
 }
-
-
 
 /**
  * @function updates the player object
@@ -149,4 +97,9 @@ Player.prototype.render = function (time, ctx) {
     ctx.stroke();
   }
   ctx.restore();
+}
+
+Player.prototype.shoot = function () {
+  console.log("BANG");
+
 }

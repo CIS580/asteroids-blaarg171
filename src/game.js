@@ -27,6 +27,7 @@ function Game(screen, updateFunction, renderFunction) {
   // Start the game loop
   this.oldTime = performance.now();
   this.paused = false;
+  this.initialized = false;
 }
 
 /**
@@ -54,3 +55,22 @@ Game.prototype.loop = function (newTime) {
   // Flip the back buffer
   this.frontCtx.drawImage(this.backBuffer, 0, 0);
 }
+
+Game.prototype.initialize = function () {
+  this.frontCtx.fillStyle = "black";
+  this.frontCtx.fillRect(0, 0, this.backBuffer.width, this.backBuffer.height);
+  this.frontCtx.fillStyle = "white";
+  this.frontCtx.font = "bold 40px Verdana";
+  this.frontCtx.textAlign = "center";
+  this.frontCtx.textBaseline = "middle";
+  this.frontCtx.fillText("Press Space to start!", this.backBuffer.width / 2, this.backBuffer.height / 2);
+
+  this.initialized = true;
+  this.gameOver = false;
+}
+
+Game.prototype.start = function (loop) {
+  this.initialized = false;
+  window.requestAnimationFrame(loop);
+}
+
