@@ -1,12 +1,14 @@
 "use strict";
 
-const MS_PER_FRAME = 1000 / 8;
-const maxVelocity = 15;
-
 /**
  * @module exports the Player class
  */
 module.exports = exports = Player;
+
+const Laser = require('./laser');
+
+const maxVelocity = 15;
+const cooldown = 200;
 
 /**
  * @constructor Player
@@ -30,6 +32,13 @@ function Player(position, canvas) {
   this.braking = false;
   this.steerLeft = false;
   this.steerRight = false;
+
+  this.weapon = {
+    shooting: false,
+    shots: [],
+    timer: 0,
+
+  }
 
   // var self = this;
 }
@@ -70,6 +79,19 @@ Player.prototype.update = function (time) {
   if (this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
 
   // console.log("velocity = " + this.velocity.x + " / " + this.velocity.y);
+
+  this.weapon.timer += time;
+  if (this.weapon.shooting && this.weapon.timer > cooldown) {
+    this.weapon.timer = 0;
+    this.weapon.shots.push(new Laser(this.position, this.angle));
+
+  }
+  for (var i = 0; i < this.weapon.shots.length; i++) {
+    this.weapon.shots[i].update();
+    if (this.weapon.shots[i].x < 0 || this.weapon.shots[i].x > this.worldWidth) this.weapon.shots[i].dead = true;
+    if (this.weapon.shots[i].y < 0 || this.weapon.shots[i].y > this.worldHeight) this.weapon.shots[i].dead = true;
+  }
+  this.weapon.shots = this.weapon.shots.filter(function (laser) { return !laser.dead; });
 }
 
 /**
@@ -103,9 +125,8 @@ Player.prototype.render = function (time, ctx) {
     ctx.stroke();
   }
   ctx.restore();
-}
 
-Player.prototype.shoot = function () {
-  console.log("BANG");
-
+  for (var i = 0; i < this.weapon.shots.length; i++) {
+    this.weapon.shots[i].render(ctx);
+  }
 }

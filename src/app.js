@@ -103,7 +103,7 @@ window.onkeydown = function (event) {
 
         case " ": // Really JavaScript?! "Space" doesnt work but " " does?
           event.preventDefault();
-          player.shoot();
+          player.weapon.shooting = true;
           break;
       }
       break;
@@ -136,6 +136,11 @@ window.onkeyup = function (event) {
         // case "s":
         //   player.braking = false;
         //   break;
+
+        case " ": // Really JavaScript?! "Space" doesnt work but " " does?
+          event.preventDefault();
+          player.weapon.shooting = false;
+          break;
       }
       break;
   }
