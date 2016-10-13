@@ -1,8 +1,9 @@
 "use strict;"
 
 /* Classes */
-const Game = require("./game.js");
-const Player = require("./player.js");
+const Game = require("./game");
+const Player = require("./player");
+const Rock = require("./rock")
 
 /* Global variables */
 var canvas = document.getElementById("screen");
@@ -14,6 +15,12 @@ var data = {
   score: 0,
   lives: 3
 }
+
+var rocks = [
+  new Rock({ x: 200, y: 200 }, rollRandom(0, 2 * Math.PI), 0, canvas),
+  new Rock({ x: 200, y: 100 }, rollRandom(0, 2 * Math.PI), 1, canvas),
+  new Rock({ x: 150, y: 150 }, rollRandom(0, 2 * Math.PI), 2, canvas)
+];
 
 /**
  * @function masterLoop
@@ -36,7 +43,10 @@ var masterLoop = function (timestamp) {
  */
 function update(elapsedTime) {
   player.update(elapsedTime);
-  // TODO: Update the game objects
+
+  for (var i = 0; i < rocks.length; i++) {
+    rocks[i].update();
+  }
 }
 
 /**
@@ -60,6 +70,10 @@ function render(elapsedTime, ctx) {
   ctx.fillText("Lives: " + data.lives, canvas.width - 5, 10);
 
   player.render(elapsedTime, ctx);
+
+  for (var i = 0; i < rocks.length; i++) {
+    rocks[i].render(ctx);
+  }
 }
 
 window.onkeydown = function (event) {
@@ -96,10 +110,11 @@ window.onkeydown = function (event) {
           player.steerRight = true;
           break;
 
-        // case "ArrowDown":
-        // case "s":
-        //   player.braking = true;
-        //   break;
+        case "ArrowDown":
+        case "s":
+          event.preventDefault();
+          // player.braking = true;
+          break;
 
         case " ": // Really JavaScript?! "Space" doesnt work but " " does?
           event.preventDefault();
@@ -132,10 +147,11 @@ window.onkeyup = function (event) {
           player.steerRight = false;
           break;
 
-        // case "ArrowDown":
-        // case "s":
-        //   player.braking = false;
-        //   break;
+        case "ArrowDown":
+        case "s":
+          event.preventDefault();
+          // player.braking = false;
+          break;
 
         case " ": // Really JavaScript?! "Space" doesnt work but " " does?
           event.preventDefault();
@@ -154,4 +170,9 @@ canvas.oncontextmenu = function (event) {
   event.preventDefault();
 }
 
+function rollRandom(aMinimum, aMaximum) {
+  return Math.floor(Math.random() * (aMaximum - aMinimum) + aMinimum);
+}
+
 game.initialize();
+

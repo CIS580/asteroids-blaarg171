@@ -5,9 +5,10 @@
  */
 module.exports = exports = Player;
 
-const Laser = require('./laser');
+const Laser = require("./laser");
 
-const maxVelocity = 15;
+const turnSpeed = 0.075;
+const maxVelocity = 7.5;
 const cooldown = 200;
 
 /**
@@ -49,13 +50,14 @@ function Player(position, canvas) {
  */
 Player.prototype.update = function (time) {
   // Apply angular velocity
-  if (this.steerLeft) this.angle += 0.1;
-  if (this.steerRight) this.angle -= 0.1;
+  if (this.steerLeft) this.angle += turnSpeed;
+  if (this.steerRight) this.angle -= turnSpeed;
+
   // Apply acceleration
   if (this.thrusting) {
     var acceleration = {
-      x: Math.sin(this.angle) / 4,
-      y: Math.cos(this.angle) / 4
+      x: Math.sin(this.angle) / 10,
+      y: Math.cos(this.angle) / 10
     }
     this.velocity.x -= acceleration.x;
     if (this.velocity.x < -maxVelocity) this.velocity.x = -maxVelocity;
@@ -112,6 +114,7 @@ Player.prototype.render = function (time, ctx) {
   ctx.lineTo(10, 10);
   ctx.closePath();
   ctx.strokeStyle = 'white';
+  ctx.lineWidth = 1;
   ctx.stroke();
 
   // Draw engine thrust
@@ -130,3 +133,4 @@ Player.prototype.render = function (time, ctx) {
     this.weapon.shots[i].render(ctx);
   }
 }
+
