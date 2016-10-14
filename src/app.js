@@ -47,6 +47,9 @@ function update(elapsedTime) {
   for (var i = 0; i < rocks.length; i++) {
     rocks[i].update();
   }
+  rocks = rocks.filter(function (rock) { return !rock.dead; });
+
+  handleCollisions(player.position, player.weapon.shots, rocks);
 }
 
 /**
@@ -168,6 +171,10 @@ canvas.onclick = function (event) {
 
 canvas.oncontextmenu = function (event) {
   event.preventDefault();
+}
+
+function handleCollisions(playerPos, shots, rocks) {
+
 }
 
 function rollRandom(aMinimum, aMaximum) {
