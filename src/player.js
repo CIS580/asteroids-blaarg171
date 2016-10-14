@@ -28,17 +28,24 @@ function Player(position, canvas) {
     y: 0
   }
   this.angle = 0;
-  this.radius = 64;
   this.thrusting = false;
   this.braking = false;
   this.steerLeft = false;
   this.steerRight = false;
+  this.dead = false;
 
   this.weapon = {
     shooting: false,
     shots: [],
     timer: 0,
 
+  }
+
+  this.collider = {
+    left: 0,
+    right: 0,
+    up: 0,
+    down: 0
   }
 
   // var self = this;
@@ -80,7 +87,12 @@ Player.prototype.update = function (time) {
   if (this.position.y < 0) this.position.y += this.worldHeight;
   if (this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
 
-  // console.log("velocity = " + this.velocity.x + " / " + this.velocity.y);
+
+  // Update collider
+  this.collider.left = this.position.x - 10;
+  this.collider.right = this.position.x + 10;
+  this.collider.up = this.position.y - 10;
+  this.collider.down = this.position.y + 10;
 
   this.weapon.timer += time;
   if (this.weapon.shooting && this.weapon.timer > cooldown) {
@@ -132,5 +144,10 @@ Player.prototype.render = function (time, ctx) {
   for (var i = 0; i < this.weapon.shots.length; i++) {
     this.weapon.shots[i].render(ctx);
   }
+
+  ctx.strokeStyle = "red";
+  ctx.beginPath();
+  ctx.arc(this.position.x, this.position.y, 10, 0, 2 * Math.PI);
+  ctx.stroke();
 }
 

@@ -28,7 +28,6 @@ var rocks = [
  * @param {DOMHighResTimeStamp} timestamp the current time
  */
 var masterLoop = function (timestamp) {
-  if (game.gameOver) { game.end(); return; }
   game.loop(timestamp);
   window.requestAnimationFrame(masterLoop);
 }
@@ -49,7 +48,8 @@ function update(elapsedTime) {
   }
   rocks = rocks.filter(function (rock) { return !rock.dead; });
 
-  handleCollisions(player.position, player.weapon.shots, rocks);
+  checkForCollisions(player, player.weapon.shots, rocks);
+  if (player.dead) game.gameOver = true;
 }
 
 /**
@@ -173,8 +173,44 @@ canvas.oncontextmenu = function (event) {
   event.preventDefault();
 }
 
-function handleCollisions(playerPos, shots, rocks) {
+function checkForCollisions(player, shots, rocks) {
+  var playCollider = player.collider;
+  var rockCollider;
+  var shotCollider;
+  var collides = false;
+  var potentials = new Array();
 
+  // Rocks Loop
+  for (var i = 0; i < rocks.length; i++) {
+    rockCollider = rocks[i].collider;
+
+    // Player
+    collides = !(
+      playCollider.left > rockCollider.right ||
+      playCollider.up > rockCollider.down ||
+      rockCollider.left > playCollider.right ||
+      rockCollider.up > playCollider.down
+    )
+    if (collides) {
+      potentials.push([rocks[i], player]);
+      console.log("collided with rock: " + i);
+    }
+
+    collides = false;
+    // Shot
+    for (var j = 0; j < player.weapon.shots.length; j++) {
+      shotCollider = player.weapon.shots[j].collider;
+      collides = !(
+        shotCollider.left > rockCollider.right ||
+        shotCollider.up > rockCollider.down ||
+        rockCollider.left > shotCollider.right ||
+        rockCollider.up > shotCollider.down
+      )
+      if (collides) {
+        potentials.push([rocks[i], player.weapon.shots[j]]);
+      }
+    }
+  }
 }
 
 function rollRandom(aMinimum, aMaximum) {

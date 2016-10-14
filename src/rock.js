@@ -15,6 +15,13 @@ function Rock(position, angle, type, canvas) {
   this.dead = false;
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
+
+  this.collider = {
+    left: 0,
+    right: 0,
+    up: 0,
+    down: 0
+  }
 }
 
 Rock.prototype.update = function () {
@@ -26,6 +33,12 @@ Rock.prototype.update = function () {
   if (this.position.x > this.worldWidth) this.position.x -= this.worldWidth;
   if (this.position.y < 0) this.position.y += this.worldHeight;
   if (this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
+
+  // Update collider
+  this.collider.left = this.position.x - this.mass / 2;
+  this.collider.right = this.position.x + this.mass / 2;
+  this.collider.up = this.position.y - this.mass / 2;
+  this.collider.down = this.position.y + this.mass / 2;
 }
 
 Rock.prototype.render = function (ctx) {
