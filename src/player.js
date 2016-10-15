@@ -10,6 +10,7 @@ const Laser = require("./laser");
 const turnSpeed = 0.075;
 const maxVelocity = 7.5;
 const cooldown = 200;
+const invulTime = 3000;
 
 /**
  * @constructor Player
@@ -32,23 +33,22 @@ function Player(position, canvas) {
   this.braking = false;
   this.steerLeft = false;
   this.steerRight = false;
+
   this.dead = false;
+  this.invulnerable = false;
+  this.timer = 0;
 
   this.weapon = {
     shooting: false,
     shots: [],
-    timer: 0,
-
+    timer: 0
   }
 
   this.collider = {
-    left: 0,
-    right: 0,
-    up: 0,
-    down: 0
+    x: 0,
+    y: 0,
+    radius: 10 + 1
   }
-
-  // var self = this;
 }
 
 /**
@@ -56,43 +56,51 @@ function Player(position, canvas) {
  * {DOMHighResTimeStamp} time the elapsed time since the last frame
  */
 Player.prototype.update = function (time) {
-  // Apply angular velocity
-  if (this.steerLeft) this.angle += turnSpeed;
-  if (this.steerRight) this.angle -= turnSpeed;
-
-  // Apply acceleration
-  if (this.thrusting) {
-    var acceleration = {
-      x: Math.sin(this.angle) / 10,
-      y: Math.cos(this.angle) / 10
+  if (this.invulnerable) {
+    this.timer += time;
+    if (this.timer >= invulTime) {
+      this.invulnerable = false;
+      this.timer = 0;
     }
-    this.velocity.x -= acceleration.x;
-    if (this.velocity.x < -maxVelocity) this.velocity.x = -maxVelocity;
-    else if (this.velocity.x > maxVelocity) this.velocity.x = maxVelocity;
-    this.velocity.y -= acceleration.y;
-    if (this.velocity.y < -maxVelocity) this.velocity.y = -maxVelocity;
-    else if (this.velocity.y > maxVelocity) this.velocity.y = maxVelocity;
   }
-  // else if (this.braking) {
-  //   this.velocity.x *= 0.9;
-  //   this.velocity.y *= 0.9;
-  // }
 
-  // Apply velocity
-  this.position.x += this.velocity.x;
-  this.position.y += this.velocity.y;
-  // Wrap around the screen
-  if (this.position.x < 0) this.position.x += this.worldWidth;
-  if (this.position.x > this.worldWidth) this.position.x -= this.worldWidth;
-  if (this.position.y < 0) this.position.y += this.worldHeight;
-  if (this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
+  if (!this.dead) {
+    // Apply angular velocity
+    if (this.steerLeft) this.angle += turnSpeed;
+    if (this.steerRight) this.angle -= turnSpeed;
+
+    // Apply acceleration
+    if (this.thrusting) {
+      var acceleration = {
+        x: Math.sin(this.angle) / 10,
+        y: Math.cos(this.angle) / 10
+      }
+      this.velocity.x -= acceleration.x;
+      if (this.velocity.x < -maxVelocity) this.velocity.x = -maxVelocity;
+      else if (this.velocity.x > maxVelocity) this.velocity.x = maxVelocity;
+      this.velocity.y -= acceleration.y;
+      if (this.velocity.y < -maxVelocity) this.velocity.y = -maxVelocity;
+      else if (this.velocity.y > maxVelocity) this.velocity.y = maxVelocity;
+    }
+    // else if (this.braking) {
+    //   this.velocity.x *= 0.9;
+    //   this.velocity.y *= 0.9;
+    // }
+
+    // Apply velocity
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+    // Wrap around the screen
+    if (this.position.x < 0) this.position.x += this.worldWidth;
+    if (this.position.x > this.worldWidth) this.position.x -= this.worldWidth;
+    if (this.position.y < 0) this.position.y += this.worldHeight;
+    if (this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
 
 
-  // Update collider
-  this.collider.left = this.position.x - 10;
-  this.collider.right = this.position.x + 10;
-  this.collider.up = this.position.y - 10;
-  this.collider.down = this.position.y + 10;
+    // Update collider
+    this.collider.x = this.position.x;
+    this.collider.y = this.position.y;
+  }
 
   this.weapon.timer += time;
   if (this.weapon.shooting && this.weapon.timer > cooldown) {
@@ -114,40 +122,54 @@ Player.prototype.update = function (time) {
  * {CanvasRenderingContext2D} ctx the context to render into
  */
 Player.prototype.render = function (time, ctx) {
-  ctx.save();
+  if (!this.dead) {
+    ctx.save();
 
-  // Draw player's ship
-  ctx.translate(this.position.x, this.position.y);
-  ctx.rotate(-this.angle);
-  ctx.beginPath();
-  ctx.moveTo(0, -10);
-  ctx.lineTo(-10, 10);
-  ctx.lineTo(0, 0);
-  ctx.lineTo(10, 10);
-  ctx.closePath();
-  ctx.strokeStyle = 'white';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  // Draw engine thrust
-  if (this.thrusting) {
+    // Draw player's ship
+    ctx.translate(this.position.x, this.position.y);
+    ctx.rotate(-this.angle);
     ctx.beginPath();
-    ctx.moveTo(0, 20);
-    ctx.lineTo(5, 10);
-    ctx.arc(0, 10, 5, 0, Math.PI, true);
+    ctx.moveTo(0, -10);
+    ctx.lineTo(-10, 10);
+    ctx.lineTo(0, 0);
+    ctx.lineTo(10, 10);
     ctx.closePath();
-    ctx.strokeStyle = 'orange';
+    ctx.strokeStyle = (this.invulnerable) ? "#00FFFF" : "white";
+    ctx.lineWidth = 1;
     ctx.stroke();
+
+    // Draw engine thrust
+    if (this.thrusting) {
+      ctx.beginPath();
+      ctx.moveTo(0, 20);
+      ctx.lineTo(5, 10);
+      ctx.arc(0, 10, 5, 0, Math.PI, true);
+      ctx.closePath();
+      ctx.strokeStyle = 'orange';
+      ctx.stroke();
+    }
+    ctx.restore();
   }
-  ctx.restore();
 
   for (var i = 0; i < this.weapon.shots.length; i++) {
     this.weapon.shots[i].render(ctx);
   }
 
-  ctx.strokeStyle = "red";
-  ctx.beginPath();
-  ctx.arc(this.position.x, this.position.y, 10, 0, 2 * Math.PI);
-  ctx.stroke();
+  // // debug collider render
+  // ctx.strokeStyle = "red";
+  // ctx.lineWidth = 1;
+  // ctx.beginPath();
+  // ctx.arc(this.collider.x, this.collider.y, this.collider.radius, 0, 2 * Math.PI);
+  // ctx.stroke();
 }
 
+Player.prototype.reset = function () {
+  this.position = { x: this.worldWidth / 2, y: this.worldHeight / 2 };
+  this.velocity = { x: 0, y: 0 };
+  this.angle = 0;
+  this.thrusting = false;
+  this.braking = false;
+  this.steerLeft = false;
+  this.steerRight = false;
+  this.weapon.timer = 0;
+}

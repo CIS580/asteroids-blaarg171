@@ -48,8 +48,8 @@ function update(elapsedTime) {
   }
   rocks = rocks.filter(function (rock) { return !rock.dead; });
 
-  checkForCollisions(player, player.weapon.shots, rocks);
-  if (player.dead) game.gameOver = true;
+  checkForCollisions(player, rocks);
+  // if (player.dead) game.gameOver = true;
 }
 
 /**
@@ -173,48 +173,60 @@ canvas.oncontextmenu = function (event) {
   event.preventDefault();
 }
 
-function checkForCollisions(player, shots, rocks) {
-  var playCollider = player.collider;
+function checkForCollisions(aPlayer, aRocks) {
+  var playCollider = aPlayer.collider;
   var rockCollider;
   var shotCollider;
   var collides = false;
+  var distance = 0;
+  var radii = 0;
   var potentials = new Array();
 
   // Rocks Loop
-  for (var i = 0; i < rocks.length; i++) {
-    rockCollider = rocks[i].collider;
+  for (var i = 0; i < aRocks.length; i++) {
+    rockCollider = aRocks[i].collider;
 
     // Player
-    collides = !(
-      playCollider.left > rockCollider.right ||
-      playCollider.up > rockCollider.down ||
-      rockCollider.left > playCollider.right ||
-      rockCollider.up > playCollider.down
-    )
-    if (collides) {
-      potentials.push([rocks[i], player]);
-      console.log("collided with rock: " + i);
-    }
+    radii = rockCollider.radius + playCollider.radius;
+    distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: playCollider.x, y: playCollider.y });
+    collides = distance <= radii;
+    if (collides && !aPlayer.invulnerable) playerDie();
 
-    collides = false;
     // Shot
-    for (var j = 0; j < player.weapon.shots.length; j++) {
-      shotCollider = player.weapon.shots[j].collider;
-      collides = !(
-        shotCollider.left > rockCollider.right ||
-        shotCollider.up > rockCollider.down ||
-        rockCollider.left > shotCollider.right ||
-        rockCollider.up > shotCollider.down
-      )
+    for (var j = 0; j < aPlayer.weapon.shots.length; j++) {
+      collides = false;
+      shotCollider = aPlayer.weapon.shots[j].collider;
+      radii = rockCollider.radius + shotCollider.radius;
+      distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: shotCollider.x, y: shotCollider.y });
+      collides = distance <= radii;
       if (collides) {
-        potentials.push([rocks[i], player.weapon.shots[j]]);
+        potentials.push([aRocks[i], aPlayer.weapon.shots[j]]);
       }
     }
   }
 }
 
+function playerDie() {
+  if (--data.lives > 0) {
+    player.invulnerable = true;
+    player.reset();
+  }
+  else {
+    data.lives = 0;
+    player.dead = true;
+    player.position = { x: -100, y: -100 };
+  }
+}
+
 function rollRandom(aMinimum, aMaximum) {
   return Math.floor(Math.random() * (aMaximum - aMinimum) + aMinimum);
+}
+
+function calcDistance(a, b) {
+  var deltaX = b.x - a.x;
+  var deltaY = b.y - a.y;
+  var sum = Math.pow(deltaX, 2) + Math.pow(deltaY, 2);
+  return Math.sqrt(sum);
 }
 
 game.initialize();

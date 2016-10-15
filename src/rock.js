@@ -17,10 +17,9 @@ function Rock(position, angle, type, canvas) {
   this.worldHeight = canvas.height;
 
   this.collider = {
-    left: 0,
-    right: 0,
-    up: 0,
-    down: 0
+    x: 0,
+    y: 0,
+    radius: this.mass / 2 + 1
   }
 }
 
@@ -35,17 +34,22 @@ Rock.prototype.update = function () {
   if (this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
 
   // Update collider
-  this.collider.left = this.position.x - this.mass / 2;
-  this.collider.right = this.position.x + this.mass / 2;
-  this.collider.up = this.position.y - this.mass / 2;
-  this.collider.down = this.position.y + this.mass / 2;
+  this.collider.x = this.position.x + this.collider.radius;
+  this.collider.y = this.position.y + this.collider.radius;
 }
 
 Rock.prototype.render = function (ctx) {
   ctx.beginPath();
-  ctx.arc(this.position.x + this.mass / 2, this.position.y + this.mass / 2, this.mass / 2, 0, 2 * Math.PI);
+  ctx.arc(this.position.x + this.collider.radius, this.position.y + this.collider.radius, this.collider.radius, 0, 2 * Math.PI);
   ctx.strokeStyle = "white";
   ctx.lineWidth = 2;
   ctx.stroke();
+
+  // // debug collider render
+  // ctx.strokeStyle = "red";
+  // ctx.lineWidth = 1;
+  // ctx.beginPath();
+  // ctx.arc(this.collider.x, this.collider.y, this.collider.radius, 0, 2 * Math.PI);
+  // ctx.stroke();
 }
 
