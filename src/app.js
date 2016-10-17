@@ -125,11 +125,6 @@ window.onkeydown = function (event) {
           event.preventDefault();
           player.weapon.shooting = true;
           break;
-
-        case "shift":
-          player.position = { x: rollRandom(0, canvas.width), y: rollRandom(0, canvas.height) };
-          player.invulnerable = true;
-          break;
       }
       break;
   }
@@ -166,6 +161,14 @@ window.onkeyup = function (event) {
         case " ": // Really JavaScript?! "Space" doesnt work but " " does?
           event.preventDefault();
           player.weapon.shooting = false;
+          break;
+
+        // case "ShiftLeft":
+        // case "ShiftRight":
+        case "Enter":
+          event.preventDefault();
+          player.position = { x: rollRandom(0, canvas.width), y: rollRandom(0, canvas.height) };
+          player.invulnerable = true;
           break;
       }
       break;

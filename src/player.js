@@ -10,7 +10,7 @@ const Laser = require("./laser");
 const turnSpeed = 0.075;
 const maxVelocity = 7.5;
 const cooldown = 200;
-const invulTime = 3000;
+const invulTime = 1250;
 
 /**
  * @constructor Player
