@@ -2,8 +2,9 @@
 
 module.exports = exports = Rock;
 
-var speeds = [1, 2, 3];
-var masses = [64, 32, 8];
+var speeds = [0.5, 1, 2];
+var masses = [100, 50, 20];
+var angles = [Math.PI / 4, Math.PI / 6];
 
 function Rock(position, angle, type, canvas) {
   this.position = { x: position.x, y: position.y };
@@ -19,11 +20,12 @@ function Rock(position, angle, type, canvas) {
   this.collider = {
     x: 0,
     y: 0,
-    radius: this.mass / 2 + 1
+    radius: this.mass / 2
   }
 }
 
 Rock.prototype.update = function () {
+  if (this.dead) return;
   this.position.x -= this.speed * this.velocity.x;
   this.position.y -= this.speed * this.velocity.y;
 
@@ -39,6 +41,7 @@ Rock.prototype.update = function () {
 }
 
 Rock.prototype.render = function (ctx) {
+  if (this.dead) return;
   ctx.beginPath();
   ctx.arc(this.position.x + this.collider.radius, this.position.y + this.collider.radius, this.collider.radius, 0, 2 * Math.PI);
   ctx.strokeStyle = "white";
@@ -53,3 +56,22 @@ Rock.prototype.render = function (ctx) {
   // ctx.stroke();
 }
 
+Rock.prototype.split = function (aRocks) {
+  this.dead = true;
+  switch (this.type) {
+    case 0:
+      aRocks.push(new Rock(this.position, this.angle - angles[0], 1, { width: this.worldWidth, height: this.worldHeight }));
+      aRocks.push(new Rock(this.position, this.angle + angles[0], 1, { width: this.worldWidth, height: this.worldHeight }));
+      break;
+
+    case 1:
+      aRocks.push(new Rock(this.position, this.angle - angles[0], 2, { width: this.worldWidth, height: this.worldHeight }));
+      aRocks.push(new Rock(this.position, this.angle + angles[0], 2, { width: this.worldWidth, height: this.worldHeight }));
+      aRocks.push(new Rock(this.position, this.angle - angles[1], 2, { width: this.worldWidth, height: this.worldHeight }));
+      aRocks.push(new Rock(this.position, this.angle + angles[1], 2, { width: this.worldWidth, height: this.worldHeight }));
+      break;
+
+    case 2:
+      break;
+  }
+}

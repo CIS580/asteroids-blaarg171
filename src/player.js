@@ -47,7 +47,7 @@ function Player(position, canvas) {
   this.collider = {
     x: 0,
     y: 0,
-    radius: 10 + 1
+    radius: 10
   }
 }
 

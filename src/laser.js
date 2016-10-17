@@ -3,7 +3,6 @@
 module.exports = exports = Laser;
 
 const speed = 10;
-const size = 3;
 
 function Laser(position, angle) {
   this.position = { x: position.x, y: position.y };
@@ -14,11 +13,12 @@ function Laser(position, angle) {
   this.collider = {
     x: 0,
     y: 0,
-    radius: size / 2 + 1
+    radius: 1
   }
 }
 
 Laser.prototype.update = function () {
+  if (this.dead) return;
   this.position.x -= speed * this.velocity.x;
   this.position.y -= speed * this.velocity.y;
 
@@ -28,7 +28,12 @@ Laser.prototype.update = function () {
 }
 
 Laser.prototype.render = function (ctx) {
-  ctx.fillRect(this.x, this.y, size, size);
+  if (this.dead) return;
+  ctx.beginPath();
+  ctx.arc(this.position.x + this.collider.radius, this.position.y + this.collider.radius, this.collider.radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 1;
+  ctx.stroke();
 
   // // debug collider render
   // ctx.strokeStyle = "red";
