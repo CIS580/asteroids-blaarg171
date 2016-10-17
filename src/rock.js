@@ -4,7 +4,7 @@ module.exports = exports = Rock;
 
 var speeds = [0.5, 1, 2];
 var masses = [100, 50, 20];
-var angles = [Math.PI / 4, Math.PI / 6];
+var angles = [Math.PI / 4, Math.PI / 2];
 
 function Rock(position, angle, type, canvas) {
   this.position = { x: position.x, y: position.y };

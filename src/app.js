@@ -125,6 +125,11 @@ window.onkeydown = function (event) {
           event.preventDefault();
           player.weapon.shooting = true;
           break;
+
+        case "shift":
+          player.position = { x: rollRandom(0, canvas.width), y: rollRandom(0, canvas.height) };
+          player.invulnerable = true;
+          break;
       }
       break;
   }
@@ -265,9 +270,9 @@ function generateRocks(canvas) {
     if (type < 10) {
       rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 0, canvas));
     } else if (type > 17) {
-      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 1, canvas));
-    } else {
       rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 2, canvas));
+    } else {
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 1, canvas));
     }
   }
 }
