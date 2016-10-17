@@ -13,14 +13,11 @@ var player = new Player({ x: canvas.width / 2, y: canvas.height / 2 }, canvas);
 var mainState = "prep";
 var data = {
   score: 0,
-  lives: 3
+  lives: 3,
+  level: 3
 }
 
-var rocks = [
-  new Rock({ x: 200, y: 200 }, rollRandom(0, 2 * Math.PI), 0, canvas),
-  new Rock({ x: 200, y: 100 }, rollRandom(0, 2 * Math.PI), 1, canvas),
-  new Rock({ x: 150, y: 150 }, rollRandom(0, 2 * Math.PI), 2, canvas)
-];
+var rocks = [];
 
 /**
  * @function masterLoop
@@ -49,7 +46,11 @@ function update(elapsedTime) {
   rocks = rocks.filter(function (rock) { return !rock.dead; });
 
   checkForCollisions(player, rocks);
-  // if (player.dead) game.gameOver = true;
+  rocks = rocks.filter(function (rock) { return !rock.dead });
+  if (rocks.length <= 0) {
+    data.level++;
+    generateRocks(canvas);
+  }
 }
 
 /**
@@ -72,7 +73,8 @@ function render(elapsedTime, ctx) {
   ctx.textAlign = "right";
   ctx.fillText("Lives: " + data.lives, canvas.width - 5, 10);
 
-  player.render(elapsedTime, ctx);
+  if (!player.dead) player.render(elapsedTime, ctx);
+  else game.drawEnd();
 
   for (var i = 0; i < rocks.length; i++) {
     rocks[i].render(ctx);
@@ -180,7 +182,7 @@ function checkForCollisions(aPlayer, aRocks) {
   var collides = false;
   var distance = 0;
   var radii = 0;
-  var potentials = new Array();
+  // var potentials = new Array();
 
   // Rocks Loop
   for (var i = 0; i < aRocks.length; i++) {
@@ -190,7 +192,11 @@ function checkForCollisions(aPlayer, aRocks) {
     radii = rockCollider.radius + playCollider.radius;
     distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: playCollider.x, y: playCollider.y });
     collides = distance <= radii;
-    if (collides && !aPlayer.invulnerable) playerDie();
+    if (collides && !aPlayer.invulnerable) {
+      playerDie();
+      aRocks[i].split(aRocks);
+      break;
+    }
 
     // Shot
     for (var j = 0; j < aPlayer.weapon.shots.length; j++) {
@@ -200,9 +206,26 @@ function checkForCollisions(aPlayer, aRocks) {
       distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: shotCollider.x, y: shotCollider.y });
       collides = distance <= radii;
       if (collides) {
-        potentials.push([aRocks[i], aPlayer.weapon.shots[j]]);
+        aPlayer.weapon.shots[j].dead = true;
+        aRocks[i].split(aRocks);
+        data.score += aRocks[i].mass;
       }
     }
+
+    // // Other rocks
+    // for (var k = 0; k < aRocks.length; k++) {
+    //   if (i == k) continue;
+    //   collides = false;
+    //   var rockCollider2 = aRocks[k].collider;
+    //   radii = rockCollider.radius + rockCollider2.radius;
+    //   distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: rockCollider2.x, y: rockCollider2.y })
+    //   collides = distance <= radii;
+    //   if (collides) {
+    //     aRocks[i].split(aRocks);
+    //     aRocks[k].split(aRocks);
+    //     break;
+    //   }
+    // }
   }
 }
 
@@ -210,11 +233,42 @@ function playerDie() {
   if (--data.lives > 0) {
     player.invulnerable = true;
     player.reset();
-  }
-  else {
+  } else {
     data.lives = 0;
     player.dead = true;
     player.position = { x: -100, y: -100 };
+  }
+}
+
+function generateRocks(canvas) {
+  var type;
+  var x = {
+    x: -1,
+    min: canvas.width / 4,
+    max: canvas.width / 2 + canvas.width / 4
+  }
+  var y = {
+    y: -1,
+    min: canvas.height / 4,
+    max: canvas.height / 2 + canvas.height / 4
+  }
+
+  for (var i = 0; i < data.level; i++) {
+    do {
+      x.x = rollRandom(0, canvas.width);
+    } while (x.x > x.min && x.x < x.max)
+    do {
+      y.y = rollRandom(0, canvas.height);
+    } while (y.y > y.min && y.y < y.max)
+
+    type = rollRandom(0, 20);
+    if (type < 10) {
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 0, canvas));
+    } else if (type > 17) {
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 1, canvas));
+    } else {
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 2, canvas));
+    }
   }
 }
 
@@ -229,5 +283,6 @@ function calcDistance(a, b) {
   return Math.sqrt(sum);
 }
 
+generateRocks(canvas);
 game.initialize();
 
