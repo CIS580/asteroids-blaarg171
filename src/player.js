@@ -17,7 +17,7 @@ const invulTime = 1250;
  * Creates a new player object
  * @param {Postition} position object specifying an x and y
  */
-function Player(position, canvas) {
+function Player(position, canvas, sfx) {
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
   this.position = {
@@ -49,6 +49,8 @@ function Player(position, canvas) {
     y: 0,
     radius: 10
   }
+
+  this.sfx = sfx;
 }
 
 /**
@@ -106,7 +108,7 @@ Player.prototype.update = function (time) {
   if (this.weapon.shooting && this.weapon.timer > cooldown) {
     this.weapon.timer = 0;
     this.weapon.shots.push(new Laser(this.position, this.angle));
-
+    this.sfx.play("pew");
   }
   for (var i = 0; i < this.weapon.shots.length; i++) {
     this.weapon.shots[i].update();

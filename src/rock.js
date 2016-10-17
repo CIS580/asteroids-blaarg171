@@ -6,7 +6,7 @@ var speeds = [0.5, 1, 2];
 var masses = [100, 50, 20];
 var angles = [Math.PI / 4, Math.PI / 2];
 
-function Rock(position, angle, type, canvas) {
+function Rock(position, angle, type, canvas, sfx) {
   this.position = { x: position.x, y: position.y };
   this.angle = angle;
   this.type = type;
@@ -22,6 +22,8 @@ function Rock(position, angle, type, canvas) {
     y: 0,
     radius: this.mass / 2
   }
+
+  this.sfx = sfx;
 }
 
 Rock.prototype.update = function () {
@@ -58,17 +60,18 @@ Rock.prototype.render = function (ctx) {
 
 Rock.prototype.split = function (aRocks) {
   this.dead = true;
+  this.sfx.play((this.type == 0) ? "big" : (this.type == 1) ? "med" : "sma");
   switch (this.type) {
     case 0:
-      aRocks.push(new Rock(this.position, this.angle - angles[0], 1, { width: this.worldWidth, height: this.worldHeight }));
-      aRocks.push(new Rock(this.position, this.angle + angles[0], 1, { width: this.worldWidth, height: this.worldHeight }));
+      aRocks.push(new Rock(this.position, this.angle - angles[0], 1, { width: this.worldWidth, height: this.worldHeight }, this.sfx));
+      aRocks.push(new Rock(this.position, this.angle + angles[0], 1, { width: this.worldWidth, height: this.worldHeight }, this.sfx));
       break;
 
     case 1:
-      aRocks.push(new Rock(this.position, this.angle - angles[0], 2, { width: this.worldWidth, height: this.worldHeight }));
-      aRocks.push(new Rock(this.position, this.angle + angles[0], 2, { width: this.worldWidth, height: this.worldHeight }));
-      aRocks.push(new Rock(this.position, this.angle - angles[1], 2, { width: this.worldWidth, height: this.worldHeight }));
-      aRocks.push(new Rock(this.position, this.angle + angles[1], 2, { width: this.worldWidth, height: this.worldHeight }));
+      aRocks.push(new Rock(this.position, this.angle - angles[0], 2, { width: this.worldWidth, height: this.worldHeight }, this.sfx));
+      aRocks.push(new Rock(this.position, this.angle + angles[0], 2, { width: this.worldWidth, height: this.worldHeight }, this.sfx));
+      aRocks.push(new Rock(this.position, this.angle - angles[1], 2, { width: this.worldWidth, height: this.worldHeight }, this.sfx));
+      aRocks.push(new Rock(this.position, this.angle + angles[1], 2, { width: this.worldWidth, height: this.worldHeight }, this.sfx));
       break;
 
     case 2:

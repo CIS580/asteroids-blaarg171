@@ -3,12 +3,14 @@
 /* Classes */
 const Game = require("./game");
 const Player = require("./player");
-const Rock = require("./rock")
+const Rock = require("./rock");
+const SFX = require("./sfx");
 
 /* Global variables */
 var canvas = document.getElementById("screen");
+var sfx = new SFX();
 var game = new Game(canvas, update, render);
-var player = new Player({ x: canvas.width / 2, y: canvas.height / 2 }, canvas);
+var player = new Player({ x: canvas.width / 2, y: canvas.height / 2 }, canvas, sfx);
 
 var mainState = "prep";
 var data = {
@@ -167,6 +169,7 @@ window.onkeyup = function (event) {
         // case "ShiftRight":
         case "Enter":
           event.preventDefault();
+          sfx.play("warp");
           player.position = { x: rollRandom(0, canvas.width), y: rollRandom(0, canvas.height) };
           player.invulnerable = true;
           break;
@@ -271,11 +274,11 @@ function generateRocks(canvas) {
 
     type = rollRandom(0, 20);
     if (type < 10) {
-      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 0, canvas));
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 0, canvas, this.sfx));
     } else if (type > 17) {
-      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 2, canvas));
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 2, canvas, this.sfx));
     } else {
-      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 1, canvas));
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 1, canvas, this.sfx));
     }
   }
 }
