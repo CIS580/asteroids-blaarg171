@@ -9,8 +9,9 @@ const Laser = require("./laser");
 
 const turnSpeed = 0.075;
 const maxVelocity = 7.5;
-const cooldown = 225;
-const invulTime = 1250;
+const weaponTime = 225;
+const invulnTime = 1500;
+const warpTime = 5000;
 
 /**
  * @constructor Player
@@ -36,18 +37,23 @@ function Player(position, canvas, sfx) {
 
   this.dead = false;
   this.invulnerable = false;
-  this.timer = 0;
+  this.warping = false;
 
   this.weapon = {
     shooting: false,
-    shots: [],
-    timer: 0
+    shots: []
   }
 
   this.collider = {
     x: 0,
     y: 0,
-    radius: 10
+    radius: 15
+  }
+
+  this.timers = {
+    weapon: 0,
+    invuln: 0,
+    warp: warpTime
   }
 
   this.sfx = sfx;
@@ -59,10 +65,18 @@ function Player(position, canvas, sfx) {
  */
 Player.prototype.update = function (time) {
   if (this.invulnerable) {
-    this.timer += time;
-    if (this.timer >= invulTime) {
+    this.timers.invuln += time;
+    if (this.timers.invuln >= invulnTime) {
       this.invulnerable = false;
-      this.timer = 0;
+      this.timers.invuln = 0;
+    }
+  }
+
+  if (this.warping) {
+    this.timers.warp -= time;
+    if (this.timers.warp <= 0) {
+      this.timers.warp = warpTime;
+      this.warping = false;
     }
   }
 
@@ -104,9 +118,9 @@ Player.prototype.update = function (time) {
     this.collider.y = this.position.y;
   }
 
-  this.weapon.timer += time;
-  if (this.weapon.shooting && this.weapon.timer > cooldown) {
-    this.weapon.timer = 0;
+  this.timers.weapon += time;
+  if (this.weapon.shooting && this.timers.weapon > weaponTime && !this.dead) {
+    this.timers.weapon = 0;
     this.weapon.shots.push(new Laser(this.position, this.angle));
     this.sfx.play("pew");
   }
@@ -124,6 +138,13 @@ Player.prototype.update = function (time) {
  * {CanvasRenderingContext2D} ctx the context to render into
  */
 Player.prototype.render = function (time, ctx) {
+  if (this.warping) {
+    ctx.fillStyle = "white";
+    ctx.font = "15px Verdana";
+    ctx.textAlign = "left";
+    ctx.fillText("Warp Cooldown: " + (this.timers.warp / 1000).toFixed(1), 5, this.worldHeight - 10);
+  }
+
   if (!this.dead) {
     ctx.save();
 
@@ -136,7 +157,7 @@ Player.prototype.render = function (time, ctx) {
     ctx.lineTo(0, 0);
     ctx.lineTo(10, 10);
     ctx.closePath();
-    ctx.strokeStyle = (this.invulnerable) ? "#00FFFF" : "white";
+    ctx.strokeStyle = "white";
     ctx.lineWidth = 1;
     ctx.stroke();
 
@@ -151,6 +172,13 @@ Player.prototype.render = function (time, ctx) {
       ctx.stroke();
     }
     ctx.restore();
+
+    if (this.invulnerable) {
+      ctx.beginPath();
+      ctx.strokeStyle = "#00FFFF";
+      ctx.arc(this.position.x, this.position.y, this.collider.radius, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
   }
 
   for (var i = 0; i < this.weapon.shots.length; i++) {
@@ -174,4 +202,13 @@ Player.prototype.reset = function () {
   this.steerLeft = false;
   this.steerRight = false;
   this.weapon.timer = 0;
+}
+
+Player.prototype.warp = function (position) {
+  if (this.timers.warp == warpTime && !this.dead) {
+    this.sfx.play("warp");
+    this.position = position;
+    this.warping = true;
+    this.invulnerable = true;
+  }
 }

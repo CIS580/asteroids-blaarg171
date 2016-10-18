@@ -169,9 +169,7 @@ window.onkeyup = function (event) {
         // case "ShiftRight":
         case "Enter":
           event.preventDefault();
-          sfx.play("warp");
-          player.position = { x: rollRandom(0, canvas.width), y: rollRandom(0, canvas.height) };
-          player.invulnerable = true;
+          player.warp({ x: rollRandom(0, canvas.width), y: rollRandom(0, canvas.height) });
           break;
       }
       break;
@@ -203,8 +201,8 @@ function checkForCollisions(aPlayer, aRocks) {
     radii = rockCollider.radius + playCollider.radius;
     distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: playCollider.x, y: playCollider.y });
     collides = distance <= radii;
-    if (collides && !(aPlayer.invulnerable || player.dead)) {
-      playerDie();
+    if (collides && !player.dead) {
+      if (!aPlayer.invulnerable) playerDie();
       aRocks[i].split(aRocks);
       break;
     }
