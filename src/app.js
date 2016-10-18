@@ -185,9 +185,9 @@ canvas.oncontextmenu = function (event) {
 }
 
 function checkForCollisions(aPlayer, aRocks) {
-  var playCollider = aPlayer.collider;
-  var rockCollider;
-  var shotCollider;
+  var playPos = player.position;
+  var rockPos;
+  var shotPos;
   var collides = false;
   var distance = 0;
   var radii = 0;
@@ -195,11 +195,11 @@ function checkForCollisions(aPlayer, aRocks) {
 
   // Rocks Loop
   for (var i = 0; i < aRocks.length; i++) {
-    rockCollider = aRocks[i].collider;
+    rockPos = aRocks[i].position;
 
     // Player
-    radii = rockCollider.radius + playCollider.radius;
-    distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: playCollider.x, y: playCollider.y });
+    radii = aRocks[i].radius + aPlayer.radius;
+    distance = calcDistance(rockPos, playPos);
     collides = distance <= radii;
     if (collides && !player.dead) {
       if (!aPlayer.invulnerable) playerDie();
@@ -210,9 +210,9 @@ function checkForCollisions(aPlayer, aRocks) {
     // Shot
     for (var j = 0; j < aPlayer.weapon.shots.length; j++) {
       collides = false;
-      shotCollider = aPlayer.weapon.shots[j].collider;
-      radii = rockCollider.radius + shotCollider.radius;
-      distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: shotCollider.x, y: shotCollider.y });
+      shotPos = aPlayer.weapon.shots[j].position;
+      radii = aRocks[i].radius + aPlayer.weapon.shots[j].radius;
+      distance = calcDistance(rockPos, shotPos);
       collides = distance <= radii;
       if (collides) {
         aPlayer.weapon.shots[j].dead = true;

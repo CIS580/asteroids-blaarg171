@@ -44,11 +44,7 @@ function Player(position, canvas, sfx) {
     shots: []
   }
 
-  this.collider = {
-    x: 0,
-    y: 0,
-    radius: 15
-  }
+  this.radius = 15
 
   this.timers = {
     weapon: 0,
@@ -111,11 +107,6 @@ Player.prototype.update = function (time) {
     if (this.position.x > this.worldWidth) this.position.x -= this.worldWidth;
     if (this.position.y < 0) this.position.y += this.worldHeight;
     if (this.position.y > this.worldHeight) this.position.y -= this.worldHeight;
-
-
-    // Update collider
-    this.collider.x = this.position.x;
-    this.collider.y = this.position.y;
   }
 
   this.timers.weapon += time;
@@ -177,7 +168,7 @@ Player.prototype.render = function (time, ctx) {
     if (this.invulnerable) {
       ctx.beginPath();
       ctx.strokeStyle = "#00FFFF";
-      ctx.arc(this.position.x, this.position.y, this.collider.radius, 0, 2 * Math.PI);
+      ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
       ctx.stroke();
     }
   }
@@ -185,13 +176,6 @@ Player.prototype.render = function (time, ctx) {
   for (var i = 0; i < this.weapon.shots.length; i++) {
     this.weapon.shots[i].render(ctx);
   }
-
-  // // debug collider render
-  // ctx.strokeStyle = "red";
-  // ctx.lineWidth = 1;
-  // ctx.beginPath();
-  // ctx.arc(this.collider.x, this.collider.y, this.collider.radius, 0, 2 * Math.PI);
-  // ctx.stroke();
 }
 
 Player.prototype.reset = function () {
