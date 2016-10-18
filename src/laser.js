@@ -4,9 +4,10 @@ module.exports = exports = Laser;
 
 const speed = 10;
 
-function Laser(position, angle, canvas) {
+function Laser(type, position, angle, canvas) {
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
+  this.type = type;
   this.position = { x: position.x, y: position.y };
   this.angle = angle;
   this.velocity = { x: Math.sin(this.angle), y: Math.cos(this.angle) };
@@ -28,7 +29,7 @@ Laser.prototype.render = function (ctx) {
   if (this.dead) return;
   ctx.beginPath();
   ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
-  ctx.strokeStyle = "#32ff00";
+  ctx.strokeStyle = (this.type == 0) ? "#32ff00" : "#ff1414";
   ctx.lineWidth = 1;
   ctx.stroke();
 

@@ -6,6 +6,7 @@ var pew = new Audio();
 var die = new Audio();
 var pew2 = new Audio();
 var warp = new Audio();
+var ufoHit = new Audio();
 // var flame = new Audio();
 var shipHit = new Audio();
 var breakBig = new Audio();
@@ -22,6 +23,8 @@ function SFX() {
   pew2.volume = 0.25;
   warp.src = encodeURI("assets/warp.wav");
   warp.volume = 0.25;
+  ufoHit.src = encodeURI("assets/ufoHit.wav");
+  ufoHit.volume = 0.75;
   // flame.src = encodeURI("assets/flame.wav");
   // flame.volume = 0.25;
   shipHit.src = encodeURI("assets/shipHit.wav");
@@ -61,7 +64,11 @@ SFX.prototype.play = function (sound) {
     //   flame.play();
     //   break;
 
-    case "hit":
+    case "playerHit":
+      shipHit.play();
+      break;
+
+    case "ufoHit":
       shipHit.play();
       break;
 

@@ -5,6 +5,7 @@ const Game = require("./game");
 const Player = require("./player");
 const Rock = require("./rock");
 const SFX = require("./sfx");
+const UFO = require("./ufo");
 
 /* Global variables */
 var canvas = document.getElementById("screen");
@@ -12,6 +13,7 @@ var sfx = new SFX();
 var game = new Game(canvas, update, render);
 var rocks = [];
 var shots = [];
+var ufos = [new UFO({ x: canvas.width, y: 200 }, canvas, addShot, sfx)];
 var player = new Player({ x: canvas.width / 2, y: canvas.height / 2 }, canvas, addShot, sfx);
 
 var mainState = "prep";
@@ -41,6 +43,11 @@ var masterLoop = function (timestamp) {
  */
 function update(elapsedTime) {
   player.update(elapsedTime);
+
+  for (var i = 0; i < ufos.length; i++) {
+    ufos[i].update(elapsedTime);
+  }
+  ufos = ufos.filter(function (ufo) { return !ufo.dead });
 
   for (var i = 0; i < rocks.length; i++) {
     rocks[i].update();
@@ -82,6 +89,10 @@ function render(elapsedTime, ctx) {
 
   if (!player.dead) player.render(elapsedTime, ctx);
   else game.drawEnd();
+
+  for (var i = 0; i < ufos.length; i++) {
+    ufos[i].render(ctx);
+  }
 
   for (var i = 0; i < rocks.length; i++) {
     rocks[i].render(ctx);
@@ -249,11 +260,53 @@ function checkForCollisions(aPlayer, aRocks) {
     //   }
     // }
   }
+
+  // UFOs
+  for (var i = 0; i < ufos.length; i++) {
+    // Player
+    radii = ufos[i].radius + aPlayer.radius - 2;
+    distance = calcDistance(ufos[i].position, playPos);
+    collides = distance <= radii;
+    if (collides && !player.dead) {
+      if (!aPlayer.invulnerable) playerDie();
+      sfx.play("ufoHit");
+      ufos[i].dead = true;
+      break;
+    }
+
+    //Shots
+    for (var j = 0; j < shots.length; j++) {
+      collides = false;
+      switch (shots[j].type) {
+        case 0:
+          distance = calcDistance(shots[j].position, ufos[i].position);
+          radii = shots[j].radius + ufos[i].radius;
+          collides = distance <= radii;
+          if (collides) {
+            sfx.play("ufoHit");
+            ufos[i].dead = true;
+            data.score += 250;
+            if (rollRandom(1, 20) >= 18) data.lives++;
+          }
+          break;
+
+        case 1:
+          distance = calcDistance(shots[j].position, playPos);
+          radii = shots[j].radius + aPlayer.radius - 2;
+          collides = distance <= radii;
+          if (collides && !player.dead) {
+            if (!aPlayer.invulnerable) playerDie();
+            break;
+          }
+          break;
+      }
+    }
+  }
 }
 
 function playerDie() {
   if (--data.lives > 0) {
-    sfx.play("hit");
+    sfx.play("playerHit");
     player.invulnerable = true;
     player.reset();
   } else {

@@ -113,7 +113,7 @@ Player.prototype.update = function (time) {
   this.timers.weapon += time;
   if (this.shooting && this.timers.weapon > weaponTime && !this.dead) {
     this.timers.weapon = 0;
-    this.shoot(new Laser(this.position, this.angle, { width: this.worldWidth, height: this.worldHeight }));
+    this.shoot(new Laser(0, this.position, this.angle, { width: this.worldWidth, height: this.worldHeight }));
     this.sfx.play("pew");
   }
 }
