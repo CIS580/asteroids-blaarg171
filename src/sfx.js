@@ -10,12 +10,18 @@ var breakSma = new Audio();
 var background = new Audio();
 
 function SFX() {
-  pew = encodeURI("assets/pew.wav");
-  warp = encodeURI("assets/warp.wav");
-  breakBig = encodeURI("assets/breakBig.wav");
-  breakMed = encodeURI("assets/breakMed.wav");
-  breakSma = encodeURI("assets/breakSma.wav");
-  background = encodeURI("assets/Dark-Techno-City_Looping.mp3");
+  pew.src = encodeURI("assets/pew.wav");
+  pew.volume = 0.25;
+  warp.src = encodeURI("assets/warp.wav");
+  warp.volume = 0.25;
+  breakBig.src = encodeURI("assets/breakBig.wav");
+  breakBig.volume = 0.25;
+  breakMed.src = encodeURI("assets/breakMed.wav");
+  breakMed.volume = 0.25;
+  breakSma.src = encodeURI("assets/breakSma.wav");
+  breakSma.volume = 0.25;
+  background.src = encodeURI("assets/Dark-Techno-City_Looping.mp3");
+  background.volume = 0.1;
   background.loop = true;
   background.play();
 }

@@ -203,7 +203,7 @@ function checkForCollisions(aPlayer, aRocks) {
     radii = rockCollider.radius + playCollider.radius;
     distance = calcDistance({ x: rockCollider.x, y: rockCollider.y }, { x: playCollider.x, y: playCollider.y });
     collides = distance <= radii;
-    if (collides && !aPlayer.invulnerable) {
+    if (collides && !(aPlayer.invulnerable || player.dead)) {
       playerDie();
       aRocks[i].split(aRocks);
       break;
@@ -247,7 +247,7 @@ function playerDie() {
   } else {
     data.lives = 0;
     player.dead = true;
-    player.position = { x: -100, y: -100 };
+    player.position = { x: -1000, y: -1000 };
   }
 }
 
@@ -274,11 +274,11 @@ function generateRocks(canvas) {
 
     type = rollRandom(0, 20);
     if (type < 10) {
-      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 0, canvas, this.sfx));
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 0, canvas, sfx));
     } else if (type > 17) {
-      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 2, canvas, this.sfx));
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 2, canvas, sfx));
     } else {
-      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 1, canvas, this.sfx));
+      rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 1, canvas, sfx));
     }
   }
 }
