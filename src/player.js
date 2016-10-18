@@ -163,6 +163,7 @@ Player.prototype.render = function (time, ctx) {
 
     // Draw engine thrust
     if (this.thrusting) {
+      // this.sfx.play("flame");
       ctx.beginPath();
       ctx.moveTo(0, 20);
       ctx.lineTo(5, 10);
@@ -170,7 +171,7 @@ Player.prototype.render = function (time, ctx) {
       ctx.closePath();
       ctx.strokeStyle = 'orange';
       ctx.stroke();
-    }
+    } //else this.sfx.stop("flame");
     ctx.restore();
 
     if (this.invulnerable) {

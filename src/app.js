@@ -240,10 +240,13 @@ function checkForCollisions(aPlayer, aRocks) {
 
 function playerDie() {
   if (--data.lives > 0) {
+    sfx.play("hit");
     player.invulnerable = true;
     player.reset();
   } else {
     data.lives = 0;
+    sfx.play("die");
+    // sfx.stop("flame");
     player.dead = true;
     player.position = { x: -1000, y: -1000 };
   }
