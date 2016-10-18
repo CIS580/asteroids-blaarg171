@@ -15,10 +15,6 @@ function UFO(position, canvas, shoot, sfx) {
     x: position.x,
     y: position.y
   };
-  this.velocity = {
-    x: 0,
-    y: 0
-  }
   this.angle = 0;
   this.dead = false;
   this.shoot = shoot;
@@ -40,20 +36,9 @@ UFO.prototype.update = function (time) {
     this.sfx.play("pew2");
     this.shoot(new Laser(1, this.position, rollRandom(0, 2 * Math.PI), { width: this.worldWidth, height: this.worldHeight }))
   }
-  // this.timers.turn += time;
-  // if (this.timers.turn >= turnTime) {
-  //   this.timers.turn = 0;
-  //   var angle = rollRandom(0, 2 * Math.PI);
-  //   this.velocity.x = Math.sin(angle);
-  //   this.velocity.y = Math.cos(angle);
-  // }
-  // this.position.x -= speed * this.velocity.x;
-  // this.position.y -= speed * this.velocity.y;
   this.position.x -= speed;
 
   if (this.position.x < 0 || this.position.x > this.worldWidth) this.dead = true;
-  // if (this.position.y < 0 || this.position.y > this.worldHeight) this.dead = true;
-
 }
 
 UFO.prototype.render = function (ctx) {

@@ -208,7 +208,7 @@ canvas.oncontextmenu = function (event) {
   event.preventDefault();
 }
 
-function checkForCollisions(aPlayer, aRocks) {
+function checkForCollisions() {
   var playPos = player.position;
   var rockPos;
   var shotPos;
@@ -218,16 +218,16 @@ function checkForCollisions(aPlayer, aRocks) {
   // var potentials = new Array();
 
   // Rocks Loop
-  for (var i = 0; i < aRocks.length; i++) {
-    rockPos = aRocks[i].position;
+  for (var i = 0; i < rocks.length; i++) {
+    rockPos = rocks[i].position;
 
     // Player
-    radii = aRocks[i].radius + aPlayer.radius - 2;
+    radii = rocks[i].radius + player.radius - 2;
     distance = calcDistance(rockPos, playPos);
     collides = distance <= radii;
     if (collides && !player.dead) {
-      if (!aPlayer.invulnerable) playerDie();
-      aRocks[i].split(aRocks);
+      if (!player.invulnerable) playerDie();
+      rocks[i].split(rocks);
       break;
     }
 
@@ -235,13 +235,13 @@ function checkForCollisions(aPlayer, aRocks) {
     for (var j = 0; j < shots.length; j++) {
       collides = false;
       shotPos = shots[j].position;
-      radii = aRocks[i].radius + shots[j].radius;
+      radii = rocks[i].radius + shots[j].radius;
       distance = calcDistance(rockPos, shotPos);
       collides = distance <= radii;
       if (collides) {
         shots[j].dead = true;
-        aRocks[i].split(aRocks);
-        data.score += aRocks[i].mass;
+        rocks[i].split(rocks);
+        data.score += rocks[i].mass;
       }
     }
 
@@ -259,16 +259,29 @@ function checkForCollisions(aPlayer, aRocks) {
     //     break;
     //   }
     // }
+
+    // UFOs
+    for (var j = 0; j < ufos.length; j++) {
+      collides = false;
+      radii = rocks[i].radius + ufos[j].radius;
+      distance = calcDistance(rockPos, ufos[j].position);
+      collides = distance <= radii;
+      if (collides) {
+        rocks[i].split(rocks);
+        sfx.play("ufoHit");
+        ufos[j].dead = true;
+      }
+    }
   }
 
   // UFOs
   for (var i = 0; i < ufos.length; i++) {
     // Player
-    radii = ufos[i].radius + aPlayer.radius - 2;
+    radii = ufos[i].radius + player.radius - 2;
     distance = calcDistance(ufos[i].position, playPos);
     collides = distance <= radii;
     if (collides && !player.dead) {
-      if (!aPlayer.invulnerable) playerDie();
+      if (!player.invulnerable) playerDie();
       sfx.play("ufoHit");
       ufos[i].dead = true;
       break;
@@ -292,10 +305,10 @@ function checkForCollisions(aPlayer, aRocks) {
 
         case 1:
           distance = calcDistance(shots[j].position, playPos);
-          radii = shots[j].radius + aPlayer.radius - 2;
+          radii = shots[j].radius + player.radius - 2;
           collides = distance <= radii;
           if (collides && !player.dead) {
-            if (!aPlayer.invulnerable) playerDie();
+            if (!player.invulnerable) playerDie();
             break;
           }
           break;
