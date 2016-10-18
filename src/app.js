@@ -20,7 +20,8 @@ var mainState = "prep";
 var data = {
   score: 0,
   lives: 3,
-  level: 3
+  level: 3,
+  kills: 0
 }
 
 var UFOTimer = 15000;
@@ -87,6 +88,7 @@ function render(elapsedTime, ctx) {
 
   ctx.textAlign = "left";
   ctx.fillText("Score: " + data.score, 5, 10);
+  ctx.fillText("Level: " + (data.level - 2), 5, 30);
 
   ctx.textAlign = "right";
   ctx.fillText("Lives: " + data.lives, canvas.width - 5, 10);
@@ -302,8 +304,8 @@ function checkForCollisions() {
           if (collides) {
             sfx.play("ufoHit");
             ufos[i].dead = true;
-            data.score += 250;
-            if (rollRandom(0, 5) >= 4) data.lives++;
+            data.kills++;
+            data.lives++;
           }
           break;
 
@@ -313,7 +315,6 @@ function checkForCollisions() {
           collides = distance <= radii;
           if (collides && !player.dead) {
             if (!player.invulnerable) playerDie();
-            break;
           }
           break;
       }
@@ -338,7 +339,7 @@ function playerDie() {
 function handleUFOs(time) {
   UFOTimer -= time;
   if (UFOTimer <= 0) {
-    UFOTimer = rollRandom(10000, 60000);
+    UFOTimer = rollRandom(10000, 30000);
     ufos.push(new UFO({ x: canvas.width, y: rollRandom(20, canvas.height - 20) }, canvas, addShot, sfx));
   }
 }
@@ -356,7 +357,8 @@ function generateRocks(canvas) {
     max: canvas.height / 2 + canvas.height / 4
   }
 
-  for (var i = 0; i < data.level; i++) {
+  var numToSpawn = data.level + data.kills;
+  for (var i = 0; i < numToSpawn; i++) {
     do {
       x.x = rollRandom(0, canvas.width);
     } while (x.x > x.min && x.x < x.max)
