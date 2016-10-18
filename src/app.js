@@ -13,7 +13,7 @@ var sfx = new SFX();
 var game = new Game(canvas, update, render);
 var rocks = [];
 var shots = [];
-var ufos = [new UFO({ x: canvas.width, y: 200 }, canvas, addShot, sfx)];
+var ufos = [];
 var player = new Player({ x: canvas.width / 2, y: canvas.height / 2 }, canvas, addShot, sfx);
 
 var mainState = "prep";
@@ -22,6 +22,8 @@ var data = {
   lives: 3,
   level: 3
 }
+
+var UFOTimer = 15000;
 
 /**
  * @function masterLoop
@@ -42,6 +44,8 @@ var masterLoop = function (timestamp) {
  * the number of milliseconds passed since the last frame.
  */
 function update(elapsedTime) {
+  handleUFOs(elapsedTime);
+
   player.update(elapsedTime);
 
   for (var i = 0; i < ufos.length; i++) {
@@ -60,7 +64,7 @@ function update(elapsedTime) {
   shots = shots.filter(function (laser) { return !laser.dead; });
 
   checkForCollisions(player, rocks);
-  rocks = rocks.filter(function (rock) { return !rock.dead });
+
   if (rocks.length <= 0) {
     data.level++;
     generateRocks(canvas);
@@ -328,6 +332,14 @@ function playerDie() {
     // sfx.stop("flame");
     player.dead = true;
     player.position = { x: -1000, y: -1000 };
+  }
+}
+
+function handleUFOs(time) {
+  UFOTimer -= time;
+  if (UFOTimer <= 0) {
+    UFOTimer = rollRandom(10000, 60000);
+    ufos.push(new UFO({ x: canvas.width, y: rollRandom(20, canvas.height - 20) }, canvas, addShot, sfx));
   }
 }
 
