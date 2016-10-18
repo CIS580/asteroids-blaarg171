@@ -10,7 +10,9 @@ const SFX = require("./sfx");
 var canvas = document.getElementById("screen");
 var sfx = new SFX();
 var game = new Game(canvas, update, render);
-var player = new Player({ x: canvas.width / 2, y: canvas.height / 2 }, canvas, sfx);
+var rocks = [];
+var shots = [];
+var player = new Player({ x: canvas.width / 2, y: canvas.height / 2 }, canvas, addShot, sfx);
 
 var mainState = "prep";
 var data = {
@@ -18,8 +20,6 @@ var data = {
   lives: 3,
   level: 3
 }
-
-var rocks = [];
 
 /**
  * @function masterLoop
@@ -46,6 +46,11 @@ function update(elapsedTime) {
     rocks[i].update();
   }
   rocks = rocks.filter(function (rock) { return !rock.dead; });
+
+  for (var i = 0; i < shots.length; i++) {
+    shots[i].update();
+  }
+  shots = shots.filter(function (laser) { return !laser.dead; });
 
   checkForCollisions(player, rocks);
   rocks = rocks.filter(function (rock) { return !rock.dead });
@@ -80,6 +85,10 @@ function render(elapsedTime, ctx) {
 
   for (var i = 0; i < rocks.length; i++) {
     rocks[i].render(ctx);
+  }
+
+  for (var i = 0; i < shots.length; i++) {
+    shots[i].render(ctx);
   }
 }
 
@@ -125,7 +134,7 @@ window.onkeydown = function (event) {
 
         case " ": // Really JavaScript?! "Space" doesnt work but " " does?
           event.preventDefault();
-          player.weapon.shooting = true;
+          player.shooting = true;
           break;
       }
       break;
@@ -162,7 +171,7 @@ window.onkeyup = function (event) {
 
         case " ": // Really JavaScript?! "Space" doesnt work but " " does?
           event.preventDefault();
-          player.weapon.shooting = false;
+          player.shooting = false;
           break;
 
         // case "ShiftLeft":
@@ -170,6 +179,10 @@ window.onkeyup = function (event) {
         case "Enter":
           event.preventDefault();
           player.warp({ x: rollRandom(0, canvas.width), y: rollRandom(0, canvas.height) });
+          break;
+
+        case "Delete":
+          player.debug.invuln = !player.debug.invuln;
           break;
       }
       break;
@@ -198,7 +211,7 @@ function checkForCollisions(aPlayer, aRocks) {
     rockPos = aRocks[i].position;
 
     // Player
-    radii = aRocks[i].radius + aPlayer.radius;
+    radii = aRocks[i].radius + aPlayer.radius - 2;
     distance = calcDistance(rockPos, playPos);
     collides = distance <= radii;
     if (collides && !player.dead) {
@@ -208,14 +221,14 @@ function checkForCollisions(aPlayer, aRocks) {
     }
 
     // Shot
-    for (var j = 0; j < aPlayer.weapon.shots.length; j++) {
+    for (var j = 0; j < shots.length; j++) {
       collides = false;
-      shotPos = aPlayer.weapon.shots[j].position;
-      radii = aRocks[i].radius + aPlayer.weapon.shots[j].radius;
+      shotPos = shots[j].position;
+      radii = aRocks[i].radius + shots[j].radius;
       distance = calcDistance(rockPos, shotPos);
       collides = distance <= radii;
       if (collides) {
-        aPlayer.weapon.shots[j].dead = true;
+        shots[j].dead = true;
         aRocks[i].split(aRocks);
         data.score += aRocks[i].mass;
       }
@@ -282,6 +295,10 @@ function generateRocks(canvas) {
       rocks.push(new Rock({ x: x.x, y: y.y }, rollRandom(0, 2 * Math.PI), 1, canvas, sfx));
     }
   }
+}
+
+function addShot(shot) {
+  shots.push(shot);
 }
 
 function rollRandom(aMinimum, aMaximum) {

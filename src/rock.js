@@ -43,8 +43,8 @@ Rock.prototype.render = function (ctx) {
   ctx.stroke();
 
   // debug render
-  ctx.fillStyle = "red";
-  ctx.fillRect(this.position.x, this.position.y, 1, 1);
+  // ctx.fillStyle = "red";
+  // ctx.fillRect(this.position.x, this.position.y, 1, 1);
 }
 
 Rock.prototype.split = function (aRocks) {

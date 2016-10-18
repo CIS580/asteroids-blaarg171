@@ -18,7 +18,7 @@ const warpTime = 5000;
  * Creates a new player object
  * @param {Postition} position object specifying an x and y
  */
-function Player(position, canvas, sfx) {
+function Player(position, canvas, shoot, sfx) {
   this.worldWidth = canvas.width;
   this.worldHeight = canvas.height;
   this.position = {
@@ -38,13 +38,10 @@ function Player(position, canvas, sfx) {
   this.dead = false;
   this.invulnerable = false;
   this.warping = false;
+  this.shooting = false;
+  this.shoot = shoot;
 
-  this.weapon = {
-    shooting: false,
-    shots: []
-  }
-
-  this.radius = 15
+  this.radius = 15;
 
   this.timers = {
     weapon: 0,
@@ -53,6 +50,10 @@ function Player(position, canvas, sfx) {
   }
 
   this.sfx = sfx;
+
+  this.debug = {
+    invuln: false
+  }
 }
 
 /**
@@ -63,7 +64,7 @@ Player.prototype.update = function (time) {
   if (this.invulnerable) {
     this.timers.invuln += time;
     if (this.timers.invuln >= invulnTime) {
-      this.invulnerable = false;
+      this.invulnerable = this.debug.invuln;
       this.timers.invuln = 0;
     }
   }
@@ -110,17 +111,11 @@ Player.prototype.update = function (time) {
   }
 
   this.timers.weapon += time;
-  if (this.weapon.shooting && this.timers.weapon > weaponTime && !this.dead) {
+  if (this.shooting && this.timers.weapon > weaponTime && !this.dead) {
     this.timers.weapon = 0;
-    this.weapon.shots.push(new Laser(this.position, this.angle));
+    this.shoot(new Laser(this.position, this.angle, { width: this.worldWidth, height: this.worldHeight }));
     this.sfx.play("pew");
   }
-  for (var i = 0; i < this.weapon.shots.length; i++) {
-    this.weapon.shots[i].update();
-    if (this.weapon.shots[i].x < 0 || this.weapon.shots[i].x > this.worldWidth) this.weapon.shots[i].dead = true;
-    if (this.weapon.shots[i].y < 0 || this.weapon.shots[i].y > this.worldHeight) this.weapon.shots[i].dead = true;
-  }
-  this.weapon.shots = this.weapon.shots.filter(function (laser) { return !laser.dead; });
 }
 
 /**
@@ -167,14 +162,11 @@ Player.prototype.render = function (time, ctx) {
 
     if (this.invulnerable) {
       ctx.beginPath();
-      ctx.strokeStyle = "#00FFFF";
+      ctx.strokeStyle = "#314dea";
+      ctx.lineWidth = 3;
       ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
       ctx.stroke();
     }
-  }
-
-  for (var i = 0; i < this.weapon.shots.length; i++) {
-    this.weapon.shots[i].render(ctx);
   }
 }
 
@@ -186,7 +178,7 @@ Player.prototype.reset = function () {
   this.braking = false;
   this.steerLeft = false;
   this.steerRight = false;
-  this.weapon.timer = 0;
+  this.timers.weapon = 0;
 }
 
 Player.prototype.warp = function (position) {
@@ -197,3 +189,4 @@ Player.prototype.warp = function (position) {
     this.invulnerable = true;
   }
 }
+
