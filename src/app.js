@@ -303,7 +303,7 @@ function checkForCollisions() {
             sfx.play("ufoHit");
             ufos[i].dead = true;
             data.score += 250;
-            if (rollRandom(1, 20) >= 18) data.lives++;
+            if (rollRandom(0, 5) >= 4) data.lives++;
           }
           break;
 
