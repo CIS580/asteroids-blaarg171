@@ -50,10 +50,6 @@ function Player(position, canvas, shoot, sfx) {
   }
 
   this.sfx = sfx;
-
-  this.debug = {
-    invuln: false
-  }
 }
 
 /**
@@ -64,7 +60,7 @@ Player.prototype.update = function (time) {
   if (this.invulnerable) {
     this.timers.invuln += time;
     if (this.timers.invuln >= invulnTime) {
-      this.invulnerable = this.debug.invuln;
+      this.invulnerable = false;
       this.timers.invuln = 0;
     }
   }

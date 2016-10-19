@@ -197,10 +197,6 @@ window.onkeyup = function (event) {
           event.preventDefault();
           player.warp({ x: rollRandom(0, canvas.width), y: rollRandom(0, canvas.height) });
           break;
-
-        case "Delete":
-          player.debug.invuln = !player.debug.invuln;
-          break;
       }
       break;
   }
